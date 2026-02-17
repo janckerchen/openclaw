@@ -134,9 +134,8 @@ export function getChildLogger(
   const base = getLogger();
   const minLevel = opts?.level ? levelToMinLevel(opts.level) : undefined;
   const name = bindings ? JSON.stringify(bindings) : undefined;
-  const subOpts: { name?: string; minLevel?: number; prefix?: string[] } = {
+  const subOpts: { name?: string; minLevel?: number } = {
     name,
-    prefix: bindings ? [name ?? ""] : [],
   };
   if (minLevel !== undefined) {
     subOpts.minLevel = minLevel;

@@ -21,7 +21,7 @@ describe("telegram custom commands schema", () => {
     ]);
   });
 
-  it("normalizes hyphens to underscores in command names", () => {
+  it("normalizes hyphens in custom command names", () => {
     const res = OpenClawSchema.safeParse({
       channels: {
         telegram: {
@@ -30,11 +30,11 @@ describe("telegram custom commands schema", () => {
       },
     });
 
-    // Hyphens are now converted to underscores for Telegram compatibility
     expect(res.success).toBe(true);
     if (!res.success) {
       return;
     }
+
     expect(res.data.channels?.telegram?.customCommands).toEqual([
       { command: "bad_name", description: "Override status" },
     ]);

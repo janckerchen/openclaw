@@ -17,8 +17,6 @@ export function normalizeTelegramCommandName(value: string): string {
     return "";
   }
   const withoutSlash = trimmed.startsWith("/") ? trimmed.slice(1) : trimmed;
-  // Convert hyphens to underscores for Telegram compatibility
-  // Telegram command names only allow a-z, 0-9, underscore
   return withoutSlash.trim().toLowerCase().replace(/-/g, "_");
 }
 

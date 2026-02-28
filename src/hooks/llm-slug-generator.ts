@@ -9,9 +9,10 @@ import {
   resolveDefaultAgentId,
   resolveAgentWorkspaceDir,
   resolveAgentDir,
+  resolveAgentEffectiveModelPrimary,
 } from "../agents/agent-scope.js";
-import { DEFAULT_MODEL, DEFAULT_PROVIDER } from "../agents/defaults.js";
-import { resolveConfiguredModelRef } from "../agents/model-selection.js";
+import { DEFAULT_PROVIDER, DEFAULT_MODEL } from "../agents/defaults.js";
+import { parseModelRef } from "../agents/model-selection.js";
 import { runEmbeddedPiAgent } from "../agents/pi-embedded.js";
 import type { OpenClawConfig } from "../config/config.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
@@ -43,12 +44,11 @@ ${params.sessionContent.slice(0, 2000)}
 
 Reply with ONLY the slug, nothing else. Examples: "vendor-pitch", "api-design", "bug-fix"`;
 
-    // Use the user's configured model instead of falling back to defaults
-    const modelRef = resolveConfiguredModelRef({
-      cfg: params.cfg,
-      defaultProvider: DEFAULT_PROVIDER,
-      defaultModel: DEFAULT_MODEL,
-    });
+    // Resolve model from agent config instead of using hardcoded defaults
+    const modelRef = resolveAgentEffectiveModelPrimary(params.cfg, agentId);
+    const parsed = modelRef ? parseModelRef(modelRef, DEFAULT_PROVIDER) : null;
+    const provider = parsed?.provider ?? DEFAULT_PROVIDER;
+    const model = parsed?.model ?? DEFAULT_MODEL;
 
     const result = await runEmbeddedPiAgent({
       sessionId: `slug-generator-${Date.now()}`,
@@ -59,8 +59,8 @@ Reply with ONLY the slug, nothing else. Examples: "vendor-pitch", "api-design", 
       agentDir,
       config: params.cfg,
       prompt,
-      provider: modelRef.provider,
-      model: modelRef.model,
+      provider,
+      model,
       timeoutMs: 15_000, // 15 second timeout
       runId: `slug-gen-${Date.now()}`,
     });
